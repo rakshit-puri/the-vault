@@ -1,58 +1,59 @@
 # The Vault
 
-Local-first MVP for managing family financial and legal assets.
+MVP for managing family financial and legal assets.
 
-## Local Apps
+## Installation
 
-- Backend: `backend/vault`
-- Frontend: `frontend`
+### Prerequisites
 
-## MongoDB Atlas
+- Java 21 or higher
+- Maven
+- Node.js and npm
+- MongoDB Atlas account
+- AWS account with S3 bucket configured for CORS (see below)
 
-The backend reads its MongoDB connection from `MONGODB_URI`.
+### Backend Setup
 
-PowerShell:
+1. Create a MongoDB Atlas cluster and obtain the connection string from **Connect > Drivers > Java**.
+2. Set the following environment variables in your PowerShell session:
+   ```
+   $env:MONGODB_URI="mongodb+srv://<username>:<password>@<cluster-host>/<database>?retryWrites=true&w=majority"
+   $env:AWS_REGION="ap-south-1"
+   $env:S3_BUCKET="<bucket-name>"
+   $env:AWS_ACCESS_KEY_ID="<access-key-id>"
+   $env:AWS_SECRET_ACCESS_KEY="<secret-access-key>"
+   ```
+   Replace placeholders with your actual values. URL-encode special characters in the password.
+3. Run the backend:
+   ```
+   cd H:\Projects\the-vault\backend\vault
+   .\mvnw.cmd spring-boot:run
+   ```
 
-```powershell
-cd H:\Projects\the-vault\backend\vault
-$env:MONGODB_URI="mongodb+srv://<username>:<password>@<cluster-host>/<database>?retryWrites=true&w=majority"
-.\mvnw.cmd spring-boot:run
-```
+### Frontend Setup
 
-Use the Atlas connection string from **Connect > Drivers > Java**. Replace the password placeholder, choose a database name such as `the-vault`, and URL-encode special characters in the password.
+1. Navigate to the frontend directory:
+   ```
+   cd H:\Projects\the-vault\frontend
+   ```
+2. Copy the example environment file:
+   ```
+   copy .env.example .env
+   ```
+3. Install dependencies:
+   ```
+   npm install
+   ```
+4. Start the development server:
+   ```
+   npm run dev
+   ```
 
-## Frontend
+The frontend runs at `http://127.0.0.1:5173` and connects to the backend at `http://localhost:8080`. Do not open `frontend/index.html` directly; use the Vite dev server.
 
-```powershell
-cd H:\Projects\the-vault\frontend
-copy .env.example .env
-cmd /c npm install
-cmd /c npm run dev
-```
+### S3 Bucket CORS Configuration
 
-The app runs at `http://127.0.0.1:5173` and expects the backend at `http://localhost:8080`. Do not open `frontend/index.html` directly; Vite needs to serve the React modules.
-
-## File Storage Direction
-
-Use Amazon S3 for file bytes and MongoDB for document metadata.
-
-Implemented MVP flow:
-
-1. Frontend asks backend for a pre-signed upload URL.
-2. Backend creates an S3 object key and returns a short-lived PUT URL.
-3. Frontend uploads the file directly to S3.
-4. Backend stores metadata in MongoDB: owner, linked asset, file name, content type, S3 bucket/key, checksum, created date.
-
-Backend local env:
-
-```properties
-AWS_REGION=ap-south-1
-S3_BUCKET=<bucket-name>
-AWS_ACCESS_KEY_ID=<access-key-id>
-AWS_SECRET_ACCESS_KEY=<secret-access-key>
-```
-
-The S3 bucket needs CORS for local uploads:
+Configure your S3 bucket with the following CORS policy for local development:
 
 ```json
 [
@@ -66,18 +67,7 @@ The S3 bucket needs CORS for local uploads:
 ]
 ```
 
-Alternatives worth considering:
+## Usage
 
-- Local filesystem storage for the first private demo only.
-- MinIO for an S3-compatible local development setup.
-- Cloudflare R2 if S3-style object storage is wanted with simpler egress pricing.
-
-## Visual Direction
-
-Good themes for this app:
-
-- Soft Ledger: warm off-white, muted green, charcoal text, subtle gold accents.
-- Quiet Trust: pale blue-gray, ink, sage, restrained cards.
-- Family Archive: ivory, soft olive, dusty rose, deep graphite.
-
-The current frontend starts with the Soft Ledger direction.
+- Access the frontend to manage family financial and legal assets.
+- Files are uploaded directly to S3, with metadata stored in MongoDB.
