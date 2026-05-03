@@ -20,7 +20,7 @@ const dataFields = {
   ],
   BANK_ACCOUNT: [
     { name: 'bankName', label: 'Bank name' },
-    { name: 'accountLast4', label: 'Account last 4 digits', maxLength: 4 },
+    { name: 'accountNumber', label: 'Account Number'},
     { name: 'ifsc', label: 'IFSC code' },
     { name: 'branch', label: 'Branch' },
   ],
